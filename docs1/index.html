@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lifting Competition Leaderboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #addForm {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            margin: 5px;
+            padding: 8px;
+            width: calc(100% - 10px);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lifting Competition Leaderboard</h1>
+    <div id="addForm">
+        <input type="text" id="name" placeholder="Name">
+        <input type="number" id="bench" placeholder="Bench Press (lbs)">
+        <input type="number" id="squat" placeholder="Squat (lbs)">
+        <input type="number" id="deadlift" placeholder="Deadlift (lbs)">
+        <button onclick="addLifter()">Add/Update Lifter</button>
+    </div>
+
+    <h2>Overall Rankings</h2>
+    <table id="overallLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Bench Press (lbs)</th>
+            <th>Squat (lbs)</th>
+            <th>Deadlift (lbs)</th>
+            <th>Total (lbs)</th>
+        </tr>
+    </table>
+
+    <h2>Bench Press Rankings</h2>
+    <table id="benchLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Bench Press (lbs)</th>
+        </tr>
+    </table>
+
+    <h2>Squat Rankings</h2>
+    <table id="squatLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Squat (lbs)</th>
+        </tr>
+    </table>
+
+    <h2>Deadlift Rankings</h2>
+    <table id="deadliftLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Deadlift (lbs)</th>
+        </tr>
+    </table>
+
+    <script>
+        let lifters = JSON.parse(localStorage.getItem('lifters')) || [];
+
+        function renderLeaderboards() {
+            renderOverallLeaderboard();
+            renderCategoryLeaderboard('bench', 'benchLeaderboard');
+            renderCategoryLeaderboard('squat', 'squatLeaderboard');
+            renderCategoryLeaderboard('deadlift', 'deadliftLeaderboard');
+        }
+
+        function renderOverallLeaderboard() {
+            const leaderboard = document.getElementById('overallLeaderboard');
+            leaderboard.innerHTML = `
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Bench Press (lbs)</th>
+                    <th>Squat (lbs)</th>
+                    <th>Deadlift (lbs)</th>
+                    <th>Total (lbs)</th>
+                </tr>
+            `;
+            lifters.sort((a, b) => b.total - a.total);
+            lifters.forEach((lifter, index) => {
+                leaderboard.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${lifter.name}</td>
+                        <td>${lifter.bench}</td>
+                        <td>${lifter.squat}</td>
+                        <td>${lifter.deadlift}</td>
+                        <td>${lifter.total}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderCategoryLeaderboard(category, tableId) {
+            const leaderboard = document.getElementById(tableId);
+            leaderboard.innerHTML = `
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>${category.charAt(0).toUpperCase() + category.slice(1)} (lbs)</th>
+                </tr>
+            `;
+            lifters.sort((a, b) => b[category] - a[category]);
+            lifters.forEach((lifter, index) => {
+                leaderboard.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${lifter.name}</td>
+                        <td>${lifter[category]}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addLifter() {
+            const name = document.getElementById('name').value;
+            const bench = parseInt(document.getElementById('bench').value) || 0;
+            const squat = parseInt(document.getElementById('squat').value) || 0;
+            const deadlift = parseInt(document.getElementById('deadlift').value) || 0;
+            
+            if (name) {
+                const total = bench + squat + deadlift;
+                const existingLifterIndex = lifters.findIndex(lifter => lifter.name.toLowerCase() === name.toLowerCase());
+                
+                if (existingLifterIndex !== -1) {
+                    // Update existing lifter
+                    lifters[existingLifterIndex] = {name, bench, squat, deadlift, total};
+                } else {
+                    // Add new lifter
+                    lifters.push({name, bench, squat, deadlift, total});
+                }
+                
+                localStorage.setItem('lifters', JSON.stringify(lifters));
+                renderLeaderboards();
+                
+                // Clear input fields
+                document.getElementById('name').value = '';
+                document.getElementById('bench').value = '';
+                document.getElementById('squat').value = '';
+                document.getElementById('deadlift').value = '';
+            }
+        }
+
+        renderLeaderboards();
+    </script>
+</body>
+</html>
