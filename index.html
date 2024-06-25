@@ -12,7 +12,7 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
-        h1 {
+        h1, h2 {
             color: #333;
             text-align: center;
         }
@@ -37,6 +37,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 5px;
+            margin-bottom: 20px;
         }
         input, button {
             margin: 5px;
@@ -56,15 +57,6 @@
 </head>
 <body>
     <h1>Lifting Competition Leaderboard</h1>
-    <table id="leaderboard">
-        <tr>
-            <th>Name</th>
-            <th>Bench Press (lbs)</th>
-            <th>Squat (lbs)</th>
-            <th>Deadlift (lbs)</th>
-            <th>Total (lbs)</th>
-        </tr>
-    </table>
     <div id="addForm">
         <input type="text" id="name" placeholder="Name">
         <input type="number" id="bench" placeholder="Bench Press (lbs)">
@@ -73,31 +65,58 @@
         <button onclick="addLifter()">Add/Update Lifter</button>
     </div>
 
+    <h2>Bench Press Rankings</h2>
+    <table id="benchLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Bench Press (lbs)</th>
+        </tr>
+    </table>
+
+    <h2>Squat Rankings</h2>
+    <table id="squatLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Squat (lbs)</th>
+        </tr>
+    </table>
+
+    <h2>Deadlift Rankings</h2>
+    <table id="deadliftLeaderboard">
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Deadlift (lbs)</th>
+        </tr>
+    </table>
+
     <script>
         let lifters = JSON.parse(localStorage.getItem('lifters')) || [];
 
         function renderLeaderboard() {
-            const leaderboard = document.getElementById('leaderboard');
-            leaderboard.innerHTML = `
-                <tr>
-                    <th>Name</th>
-                    <th>Bench Press (lbs)</th>
-                    <th>Squat (lbs)</th>
-                    <th>Deadlift (lbs)</th>
-                    <th>Total (lbs)</th>
-                </tr>
-            `;
-            lifters.sort((a, b) => b.total - a.total);
-            lifters.forEach(lifter => {
-                leaderboard.innerHTML += `
+            const categories = ['bench', 'squat', 'deadlift'];
+            categories.forEach(category => {
+                const leaderboard = document.getElementById(`${category}Leaderboard`);
+                leaderboard.innerHTML = `
                     <tr>
-                        <td>${lifter.name}</td>
-                        <td>${lifter.bench}</td>
-                        <td>${lifter.squat}</td>
-                        <td>${lifter.deadlift}</td>
-                        <td>${lifter.total}</td>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>${category.charAt(0).toUpperCase() + category.slice(1)} (lbs)</th>
                     </tr>
                 `;
+                
+                let sortedLifters = [...lifters].sort((a, b) => b[category] - a[category]);
+                sortedLifters.forEach((lifter, index) => {
+                    leaderboard.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${lifter.name}</td>
+                            <td>${lifter[category]}</td>
+                        </tr>
+                    `;
+                });
             });
         }
 
@@ -108,15 +127,14 @@
             const deadlift = parseInt(document.getElementById('deadlift').value) || 0;
             
             if (name) {
-                const total = bench + squat + deadlift;
                 const existingLifterIndex = lifters.findIndex(lifter => lifter.name.toLowerCase() === name.toLowerCase());
                 
                 if (existingLifterIndex !== -1) {
                     // Update existing lifter
-                    lifters[existingLifterIndex] = {name, bench, squat, deadlift, total};
+                    lifters[existingLifterIndex] = {name, bench, squat, deadlift};
                 } else {
                     // Add new lifter
-                    lifters.push({name, bench, squat, deadlift, total});
+                    lifters.push({name, bench, squat, deadlift});
                 }
                 
                 localStorage.setItem('lifters', JSON.stringify(lifters));
