@@ -11,75 +11,69 @@
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #4CAF50; color: white; }
         tr:nth-child(even) { background-color: #f2f2f2; }
-        #addForm { background: #fff; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-        input, button { margin: 5px; padding: 8px; width: calc(100% - 10px); }
-        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #45a049; }
     </style>
 </head>
 <body>
     <h1>Lifting Competition Leaderboard</h1>
-    <div id="addForm">
-        <input type="text" id="name" placeholder="Name">
-        <input type="number" id="bench" placeholder="Bench Press (lbs)">
-        <input type="number" id="squat" placeholder="Squat (lbs)">
-        <input type="number" id="deadlift" placeholder="Deadlift (lbs)">
-        <button onclick="addLifter()">Add/Update Lifter</button>
-    </div>
 
     <h2>Bench Press Rankings</h2>
-    <table id="benchLeaderboard"></table>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Bench Press (lbs)</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>John Doe</td>
+            <td>300</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Jane Smith</td>
+            <td>250</td>
+        </tr>
+        <!-- Add more rows as needed -->
+    </table>
 
     <h2>Squat Rankings</h2>
-    <table id="squatLeaderboard"></table>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Squat (lbs)</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Jane Smith</td>
+            <td>400</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>John Doe</td>
+            <td>380</td>
+        </tr>
+        <!-- Add more rows as needed -->
+    </table>
 
     <h2>Deadlift Rankings</h2>
-    <table id="deadliftLeaderboard"></table>
-
-    <script>
-        let lifters = JSON.parse(localStorage.getItem('lifters')) || [];
-
-        function renderLeaderboard() {
-            const categories = ['bench', 'squat', 'deadlift'];
-            categories.forEach(category => {
-                const leaderboard = document.getElementById(`${category}Leaderboard`);
-                let html = `<tr><th>Rank</th><th>Name</th><th>${category.charAt(0).toUpperCase() + category.slice(1)} (lbs)</th></tr>`;
-                
-                lifters.sort((a, b) => b[category] - a[category])
-                       .forEach((lifter, index) => {
-                    html += `<tr><td>${index + 1}</td><td>${lifter.name}</td><td>${lifter[category]}</td></tr>`;
-                });
-                
-                leaderboard.innerHTML = html;
-            });
-        }
-
-        function addLifter() {
-            const name = document.getElementById('name').value;
-            const bench = parseInt(document.getElementById('bench').value) || 0;
-            const squat = parseInt(document.getElementById('squat').value) || 0;
-            const deadlift = parseInt(document.getElementById('deadlift').value) || 0;
-            
-            if (name) {
-                const existingLifterIndex = lifters.findIndex(lifter => lifter.name.toLowerCase() === name.toLowerCase());
-                
-                if (existingLifterIndex !== -1) {
-                    lifters[existingLifterIndex] = {name, bench, squat, deadlift};
-                } else {
-                    lifters.push({name, bench, squat, deadlift});
-                }
-                
-                localStorage.setItem('lifters', JSON.stringify(lifters));
-                renderLeaderboard();
-                
-                document.getElementById('name').value = '';
-                document.getElementById('bench').value = '';
-                document.getElementById('squat').value = '';
-                document.getElementById('deadlift').value = '';
-            }
-        }
-
-        renderLeaderboard();
-    </script>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Deadlift (lbs)</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>John Doe</td>
+            <td>500</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Jane Smith</td>
+            <td>450</td>
+        </tr>
+        <!-- Add more rows as needed -->
+    </table>
 </body>
 </html>
